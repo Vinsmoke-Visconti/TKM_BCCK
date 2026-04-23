@@ -99,7 +99,7 @@ def build_topology(net):
 
     # === CE -- PE WAN (100 Mbps, 5ms) ===
     net.addLink(ce1, pe1, intfName1='ce1-eth0', intfName2='pe1-eth1', bw=100, delay='5ms')
-    net.addLink(ce2, pe1, intfName1='ce2-eth0', intfName2='pe1-eth2', bw=100, delay='5ms')
+    net.addLink(ce2, pe2, intfName1='ce2-eth0', intfName2='pe2-eth2', bw=100, delay='5ms')
     net.addLink(ce3, pe2, intfName1='ce3-eth0', intfName2='pe2-eth1', bw=100, delay='5ms')
 
     # === SITE A: Flat ===
@@ -170,13 +170,14 @@ def configure_ip(net):
     net.get('p1').cmd('ip addr add 10.0.12.1/30 dev p1-eth1')
     net.get('p2').cmd('ip addr add 10.0.12.2/30 dev p2-eth1')
 
-    # --- CE-PE WAN links ---
-    net.get('ce1').cmd('ip addr add 172.16.1.2/30 dev ce1-eth0')
-    net.get('pe1').cmd('ip addr add 172.16.1.1/30 dev pe1-eth1')
-    net.get('ce2').cmd('ip addr add 172.16.2.2/30 dev ce2-eth0')
-    net.get('pe1').cmd('ip addr add 172.16.2.1/30 dev pe1-eth2')
-    net.get('ce3').cmd('ip addr add 172.16.3.2/30 dev ce3-eth0')
-    net.get('pe2').cmd('ip addr add 172.16.3.1/30 dev pe2-eth1')
+    # --- WAN PE1 -- CE1
+    net.get('pe1').intf('pe1-eth1').setIP('172.16.1.1/30')
+    net.get('ce1').intf('ce1-eth0').setIP('172.16.1.2/30')
+    # --- WAN PE2 -- CE3/CE2
+    net.get('pe2').intf('pe2-eth1').setIP('172.16.3.1/30')
+    net.get('ce3').intf('ce3-eth0').setIP('172.16.3.2/30')
+    net.get('pe2').intf('pe2-eth2').setIP('172.16.2.1/30')
+    net.get('ce2').intf('ce2-eth0').setIP('172.16.2.2/30')
 
     # --- CE LAN gateways ---
     net.get('ce1').cmd('ip addr add 192.168.10.1/24 dev ce1-eth1')
@@ -201,17 +202,17 @@ def configure_ip(net):
     # STATIC ROUTES - Chi cau hinh route tu PE xuong CE va default route tu CE len PE
     # ================================================================
 
-    # PE1: biet duong den Site A, B (truc tiep qua CE)
-    net.get('pe1').cmd('ip route add 192.168.10.0/24 via 172.16.1.2')   # -> CE1 -> Site A
-    net.get('pe1').cmd('ip route add 192.168.20.0/24 via 172.16.2.2')   # -> CE2 -> Site B
+    # PE1: biet duong den Site A (truc tiep qua CE1)
+    net.get('pe1').cmd('ip route add 192.168.10.0/24 via 172.16.1.2')
 
-    # PE2: biet duong den Site C (truc tiep qua CE3)
-    net.get('pe2').cmd('ip route add 192.168.30.0/24 via 172.16.3.2')   # -> CE3 -> Site C
+    # PE2: biet duong den Site B, C (truc tiep qua CE2, CE3)
+    net.get('pe2').cmd('ip route add 192.168.20.0/24 via 172.16.2.2')
+    net.get('pe2').cmd('ip route add 192.168.30.0/24 via 172.16.3.2')
 
     # CE1: default qua PE1
     net.get('ce1').cmd('ip route add default via 172.16.1.1')
 
-    # CE2: default qua PE1
+    # CE2: default qua PE2
     net.get('ce2').cmd('ip route add default via 172.16.2.1')
 
     # CE3: default qua PE2

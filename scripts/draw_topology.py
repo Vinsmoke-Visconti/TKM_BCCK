@@ -35,8 +35,8 @@ def main():
     
     # 2. Customer Edges
     pos['CE1'] = (2, 6.5)
-    pos['CE2'] = (2, 3.5)
-    pos['CE3'] = (8, 5)
+    pos['CE2'] = (8, 3.5)
+    pos['CE3'] = (8, 6.5)
 
     # 3. Site A - Flat Network (Top Left)
     pos['sA']  = (1, 6.5)
@@ -44,14 +44,14 @@ def main():
     pos['hA2'] = (0, 6.5)
     pos['hA3'] = (0, 5.5)
 
-    # 4. Site B - 3-Tier (Bottom Left)
-    pos['sBcore']  = (1, 3.5)
-    pos['sBdist1'] = (0, 4.2)
-    pos['sBdist2'] = (0, 2.8)
-    pos['hB1']     = (-1, 4.5)
-    pos['hB2']     = (-1, 3.9)
-    pos['hB3']     = (-1, 3.1)
-    pos['hB4']     = (-1, 2.5)
+    # 4. Site B - 3-Tier (Bottom Right)
+    pos['sBcore']  = (9, 3.5)
+    pos['sBdist1'] = (10, 4.2)
+    pos['sBdist2'] = (10, 2.8)
+    pos['hB1']     = (11, 4.5)
+    pos['hB2']     = (11, 3.9)
+    pos['hB3']     = (11, 3.1)
+    pos['hB4']     = (11, 2.5)
 
     # 5. Site C - Leaf Spine (Right)
     pos['spine1'] = (9, 6)
@@ -68,7 +68,7 @@ def main():
 
     edges = [
         ('PE1', 'P1'), ('P1', 'P2'), ('P2', 'PE2'),
-        ('CE1', 'PE1'), ('CE2', 'PE1'), ('CE3', 'PE2'),
+        ('CE1', 'PE1'), ('CE2', 'PE2'), ('CE3', 'PE2'),
         ('sA', 'CE1'), ('hA1', 'sA'), ('hA2', 'sA'), ('hA3', 'sA'),
         ('sBcore', 'CE2'), ('sBdist1', 'sBcore'), ('sBdist2', 'sBcore'),
         ('hB1', 'sBdist1'), ('hB2', 'sBdist1'), ('hB3', 'sBdist2'), ('hB4', 'sBdist2'),
@@ -104,13 +104,13 @@ def main():
     ax.add_patch(Rectangle((-0.5, 5.0), 3.0, 3.0, fill=True, color='#D6EAF8', alpha=0.5, zorder=0))
     plt.text(1.0, 7.8, "Site A: Flat Network\n(192.168.10.0/24)", fontsize=13, fontweight='bold', color='#154360', ha='center')
 
-    # Site B (Bottom Left)
-    ax.add_patch(Rectangle((-1.5, 2.0), 4.0, 3.0, fill=True, color='#D5F5E3', alpha=0.5, zorder=0))
-    plt.text(0.5, 2.0, "Site B: 3-Tier Architecture\n(192.168.20.0/24)", fontsize=13, fontweight='bold', color='#145A32', ha='center')
+    # Site B (Bottom Right)
+    ax.add_patch(Rectangle((7.5, 1.5), 4.0, 3.0, fill=True, color='#D5F5E3', alpha=0.5, zorder=0))
+    plt.text(9.5, 1.5, "Site B: 3-Tier Architecture\n(192.168.20.0/24)", fontsize=13, fontweight='bold', color='#145A32', ha='center')
 
-    # Site C (Right)
-    ax.add_patch(Rectangle((7.5, 3.0), 4.0, 4.0, fill=True, color='#FCF3CF', alpha=0.5, zorder=0))
-    plt.text(9.5, 7.2, "Site C: Leaf-Spine\n(192.168.30.0/24)", fontsize=13, fontweight='bold', color='#7D6608', ha='center')
+    # Site C (Top Right)
+    ax.add_patch(Rectangle((7.5, 5.0), 4.0, 4.0, fill=True, color='#FCF3CF', alpha=0.5, zorder=0))
+    plt.text(9.5, 9.2, "Site C: Leaf-Spine\n(192.168.30.0/24)", fontsize=13, fontweight='bold', color='#7D6608', ha='center')
 
     # MPLS Backbone (Center)
     ax.add_patch(Rectangle((2.5, 4.3), 5.0, 1.4, fill=True, color='#FADBD8', alpha=0.5, zorder=0))
@@ -128,7 +128,7 @@ def main():
         ["Backbone", "P2 - PE2", "10.0.24.0/30", "Kết nối Core ISP"],
         ["Backbone", "Loopback (P/PE)", "10.255.0.x / 32", "Dùng cho OSPF & LDP Router-ID"],
         ["WAN Links", "CE1 - PE1", "172.16.1.0/30", "Uplink Site A (100Mbps)"],
-        ["WAN Links", "CE2 - PE1", "172.16.2.0/30", "Uplink Site B (100Mbps)"],
+        ["WAN Links", "CE2 - PE2", "172.16.2.0/30", "Uplink Site B (100Mbps)"],
         ["WAN Links", "CE3 - PE2", "172.16.3.0/30", "Uplink Site C (100Mbps)"],
         ["LAN Site A", "Gateway CE1", "192.168.10.1", "Mạng nội bộ Site A"],
         ["LAN Site B", "Gateway CE2", "192.168.20.1", "Mạng nội bộ Site B"],
