@@ -1,0 +1,93 @@
+\section{TỔNG QUAN VÀ CƠ SỞ LÝ THUYẾT}
+
+\subsection{Tổng quan về bài toán kết nối đa chi nhánh}
+Trong bối cảnh toàn cầu hóa và chuyển đổi số mạnh mẽ, các tập đoàn và doanh nghiệp có xu hướng phân tán các hoạt động kinh doanh thành nhiều chi nhánh để tiếp cận thị trường tốt hơn. Tuy nhiên, việc vận hành một hệ thống thông tin xuyên suốt đòi hỏi phải có một hạ tầng mạng diện rộng (WAN) vừa đảm bảo băng thông cao, độ trễ thấp, vừa đáp ứng được tính bảo mật và sự cô lập về dữ liệu. Việc thuê các đường truyền leased-line điểm-điểm (Point-to-Point) truyền thống có chi phí cực kỳ đắt đỏ và thiếu tính linh hoạt khi cần mở rộng mạng lưới. 
+Chính vì vậy, công nghệ Metro Ethernet kết hợp với kiến trúc MPLS (Multiprotocol Label Switching) trên mạng của Nhà cung cấp dịch vụ (ISP) đã trở thành một giải pháp hoàn hảo để kết nối hàng loạt chi nhánh lại với nhau một cách hiệu quả, đóng vai trò như một mạng LAN ảo khổng lồ kéo dài qua nhiều khu vực địa lý.
+
+\subsection{Mạng Metro Ethernet và kiến trúc MAN}
+Metro Ethernet là mạng đô thị (MAN - Metropolitan Area Network) dựa trên nền tảng và bộ giao thức Ethernet tiêu chuẩn. Khác với kiến trúc Ethernet truyền thống chỉ giới hạn trong các tòa nhà hoặc khuôn viên hẹp (LAN), Metro Ethernet có khả năng phủ sóng qua một phạm vi thành phố lớn, đóng vai trò kết nối các mạng LAN của doanh nghiệp vào hạ tầng mạng diện rộng (WAN).
+
+\subsubsection{Ưu điểm vượt trội của Metro Ethernet}
+\begin{itemize}
+    \item \textbf{Khả năng mở rộng (Scalability):} Băng thông có thể dễ dàng được cấp phát từ vài Mbps lên đến hàng Gbps chỉ bằng cách thay đổi cấu hình phần mềm mà không cần phải triển khai cáp vật lý mới.
+    \item \textbf{Hiệu quả chi phí (Cost-effectiveness):} Các thiết bị switch và router hỗ trợ Ethernet rẻ hơn rất nhiều so với thiết bị chạy Frame Relay hay ATM.
+    \item \textbf{Tính thân thiện với IP (IP-friendly):} Hầu như toàn bộ các ứng dụng nội bộ của doanh nghiệp đều chạy trên nền tảng IP, việc sử dụng Metro Ethernet giúp quá trình đóng gói và giải nén dữ liệu diễn ra đồng nhất, giảm thiểu Overhead.
+\end{itemize}
+
+\subsection{Tổng quan về công nghệ MPLS (Multiprotocol Label Switching)}
+MPLS là một tiêu chuẩn kỹ thuật phân phối gói tin trên diện rộng do IETF (Internet Engineering Task Force) phát triển. Về mặt kiến trúc OSI, MPLS được định hình nằm giữa Lớp 2 (Data Link) và Lớp 3 (Network), thường được gọi tắt là giao thức Lớp 2.5. Thay vì thực hiện định tuyến phức tạp dựa trên địa chỉ IP đích ở mỗi điểm nút, MPLS sẽ sử dụng cơ chế "Chuyển mạch nhãn" (Label Switching).
+
+\subsubsection{Cơ chế hoạt động của MPLS}
+Khi một gói tin từ mạng nội bộ khách hàng bước vào mạng lưới MPLS của ISP (đi vào qua Router Ingress PE), nó sẽ được gán một hoặc nhiều "Nhãn" (Label) ngắn (32 bit). Khi gói tin di chuyển trong lõi mạng MPLS (qua các Router P), các thiết bị này sẽ không hề quan tâm đến nội dung gói tin hay địa chỉ IP thực sự bên trong. Chúng chỉ đơn thuần đọc "Nhãn" ở phần mào đầu, đối chiếu với Bảng chuyển tiếp nhãn (LFIB) để biết cổng ra tiếp theo, tráo đổi nhãn hiện tại bằng một nhãn mới (Swap Label) và đẩy gói tin đi tiếp ở tốc độ cực cao bằng phần cứng.
+
+\subsubsection{Lợi ích của MPLS đối với nhà cung cấp (ISP)}
+\begin{itemize}
+    \item \textbf{Tăng tốc quá trình chuyển mạch:} Giảm thiểu tối đa độ trễ tra cứu do không cần phải đi sâu vào Header IP.
+    \item \textbf{Traffic Engineering (Kỹ thuật lưu lượng):} MPLS cho phép điều hướng gói tin theo các tuyến đường cố định định trước, giúp tránh tắc nghẽn ở các đường link trung tâm, điều mà OSPF thuần túy không làm được.
+    \item \textbf{Hỗ trợ VPN (Mạng riêng ảo):} Dễ dàng tạo các VPN lớp 2 (VPLS) hoặc VPN lớp 3 trên cùng một đường truyền vật lý, đảm bảo an toàn dữ liệu và cô lập lưu lượng cho các khách hàng khác nhau.
+\end{itemize}
+
+\subsection{Giao thức định tuyến và phân phối nhãn}
+Để MPLS hoạt động được tự động, mạng lõi cần sự kết hợp của hai giao thức chính: OSPF và LDP.
+
+\subsubsection{Giao thức OSPF (Open Shortest Path First)}
+OSPF là giao thức định tuyến động nội vùng (IGP) thuộc nhóm Link-State (Trạng thái liên kết). Nó có nhiệm vụ thiết lập mối quan hệ láng giềng (Neighbor) giữa các Router của ISP và xây dựng bảng định tuyến hoàn chỉnh dựa trên thuật toán Dijkstra. Trong bài toán MPLS, OSPF rất quan trọng để đảm bảo mọi Router Core (P) và Router Biên (PE) đều "thấy" được địa chỉ Loopback của nhau. Địa chỉ Loopback (ví dụ: 10.255.0.x) không bao giờ bị "down" trừ khi thiết bị chết, do đó tạo nên sự ổn định cho quá trình cấp nhãn.
+
+\subsubsection{Giao thức LDP (Label Distribution Protocol)}
+LDP là trái tim của việc vận hành MPLS cơ bản. Sau khi OSPF đã giúp các thiết bị định tuyến được với nhau, LDP sẽ tiến hành tạo ra các "Nhãn" cục bộ cho từng đường mạng đích học được từ OSPF và "phân phát" nhãn đó cho các Router láng giềng. Thông qua quá trình phân phối và chấp nhận nhãn này, mạng lưới MPLS hình thành nên một tuyến đường chuyển mạch nhãn toàn vẹn từ đầu nguồn (Ingress) đến cuối nguồn (Egress), được gọi là LSP (Label Switched Path).
+
+\subsection{Các kiến trúc mạng LAN nội bộ doanh nghiệp}
+Mỗi chi nhánh doanh nghiệp tùy theo quy mô, mức độ quan trọng và ngân sách sẽ triển khai mạng cục bộ (LAN) khác nhau. Đồ án sẽ tập trung phân tích 3 kiến trúc điển hình:
+
+\begin{enumerate}
+    \item \textbf{Mạng Phẳng (Flat Network):}
+    Tất cả các máy tính và thiết bị đều được kết nối vào chung một hoặc vài Switch Layer 2 liên kết ngang hàng. Không có sự phân chia tầng lớp vật lý rõ rệt.
+    \begin{itemize}
+        \item \textit{Đặc điểm:} Chi phí thấp, cực kỳ dễ cấu hình.
+        \item \textit{Hạn chế:} Toàn bộ hệ thống nằm trong một Broadcast Domain duy nhất. Rất dễ xảy ra tình trạng "bão quảng bá" (Broadcast Storm) hoặc nghẽn cổ chai khi số lượng máy tính tăng lên.
+    \end{itemize}
+    
+    \item \textbf{Mạng 3 Lớp Truyền Thống (Core - Distribution - Access):}
+    Là mô hình kiến trúc tiêu chuẩn được Cisco khuyến nghị cho các doanh nghiệp vừa và lớn. Mạng được chia làm 3 tầng: Lớp Access kết nối thiết bị đầu cuối; Lớp Distribution kiểm soát chính sách mạng và gom băng thông; Lớp Core chịu trách nhiệm chuyển mạch gói tin tốc độ cao.
+    \begin{itemize}
+        \item \textit{Đặc điểm:} Dễ bảo trì, tính sẵn sàng cao (High Availability) do thiết kế có dự phòng, dễ dàng cách ly và quản lý các Broadcast Domain bằng VLAN.
+        \item \textit{Hạn chế:} Chi phí thiết bị lớn, cấu hình Spanning Tree Protocol (STP) để chống Loop phức tạp và làm lãng phí một nửa số lượng cổng mạng dự phòng.
+    \end{itemize}
+
+    \item \textbf{Mạng Leaf-Spine (Mạng 2 Lớp Hiện Đại):}
+    Là kiến trúc thế hệ mới ra đời nhằm khắc phục nhược điểm của mô hình 3 lớp. Hệ thống chỉ gồm 2 tầng: tầng Spine (Xương sống) và tầng Leaf (Lá). Mọi Switch Leaf đều được kết nối trực tiếp đến mọi Switch Spine theo cấu trúc lưới toàn phần (Full-Mesh).
+    \begin{itemize}
+        \item \textit{Đặc điểm:} Tối ưu hóa cực tốt cho lưu lượng theo chiều ngang (East-West traffic). Mọi thiết bị đầu cuối chỉ cách nhau đúng một bước nhảy qua lớp Spine, đảm bảo độ trễ ổn định tuyệt đối và tổng băng thông siêu lớn.
+        \item \textit{Hạn chế:} Tiêu tốn cực kỳ nhiều cáp quang, số lượng port giao tiếp cần thiết lớn. Thường chỉ áp dụng cho các Trung tâm dữ liệu (Data Center) hoặc các doanh nghiệp yêu cầu khắt khe về thời gian thực.
+    \end{itemize}
+\end{enumerate}
+
+\subsection{Minh chứng sơ bộ việc khởi tạo đúng Topology đề tài}
+Để khẳng định mô hình đã được xây dựng đúng chuẩn với những thiết kế lý thuyết ở trên, ngay sau khi khởi động hệ thống giả lập Mininet, ta sẽ kiểm tra toàn bộ danh sách các Node và các Link (đường truyền) kết nối giữa chúng.
+
+\begin{figure}[H]
+    \centering
+    % [NOTE] TRONG TERMINAL MININET, GÕ LỆNH `nodes` VÀ `net`. CHỤP ẢNH MÀN HÌNH CHỨA KẾT QUẢ CỦA 2 LỆNH NÀY VÀ LƯU VÀO FOLDER image/ TÊN LÀ mininet_nodes_net.png
+    \includegraphics[width=0.8\textwidth]{image/mininet_nodes_net.png}
+    \caption{Danh sách thiết bị (Nodes) và Liên kết mạng (Net) trên Mininet}
+    \label{fig:mininet_nodes}
+\end{figure}
+
+\textit{\textbf{Giải thích minh chứng:}} Từ kết quả lệnh \texttt{nodes} và \texttt{net}, ta thấy rõ hệ thống đã khởi tạo đủ 17 Hosts (bao gồm các Router P1, P2, PE1, PE2, CE1, CE2, CE3 và các máy trạm hA1-hA3, hB1-hB4, hC1-hC3) cùng với 11 Switch mạng (từ s1 đến s11). Lệnh \texttt{net} minh họa chính xác các cáp nối vật lý ảo giữa chúng, đảm bảo cấu trúc Topology được thiết lập một cách hoàn hảo:
+\begin{itemize}
+    \item Site A kết nối qua Switch phẳng \texttt{s1} (với hA1, hA2, hA3).
+    \item Site B nối phân cấp 3 lớp chuẩn mực từ Router CE2 xuống Core \texttt{s2}, rẽ nhánh sang Distribution \texttt{s3, s4} và đổ xuống Access \texttt{s5, s6} chứa các máy trạm hB.
+    \item Và đặc biệt nhất là Site C được đấu chéo dạng lưới Full-Mesh giữa các Spine (\texttt{s7, s8}) và các Leaf (\texttt{s9, s10, s11}) đúng với lý thuyết đã trình bày (có thể thấy rõ các đường nối như \texttt{s7-eth2:s9-eth1}, \texttt{s8-eth1:s9-eth2}).
+\end{itemize}
+
+Sau khi đảm bảo thiết bị đã đầy đủ, ta tiến hành gửi gói tin ICMP (Ping) liên tục từ Site A đến Site B và Site C để chứng minh toàn mạng thông suốt:
+
+\begin{figure}[H]
+    \centering
+    % [NOTE] TRONG TERMINAL MININET, GÕ LỆNH `hA1 ping -c 8 192.168.20.11` VÀ `hA1 ping -c 8 192.168.30.11` (Chờ mạng hội tụ 35 giây trước khi gõ). CHỤP MÀN HÌNH 2 KẾT QUẢ NÀY (ĐẠT 0% LOSS) LƯU VÀO image/ TÊN LÀ ping_toan_mang.png
+    \includegraphics[width=0.8\textwidth]{image/ping_toan_mang.png}
+    \caption{Kiểm tra thông mạch toàn mạng bằng 8 gói tin Ping}
+    \label{fig:ping_toan_mang}
+\end{figure}
+
+\textit{\textbf{Giải thích minh chứng:}} Lệnh Ping với tham số \texttt{-c 8} ép hệ thống gửi liên tục 8 gói tin giữa các chi nhánh ở xa nhau. Ở kết quả trả về thực tế, gói tin đi từ hA1 (Site A) sang hB1 (Site B - IP 192.168.20.11) và từ hA1 sang hC1 (Site C - IP 192.168.30.11) đều nhận được \textbf{8 phản hồi (8 received)} và cho ra \textbf{0\% packet loss}. Độ trễ (RTT) trung bình duy trì cực kỳ ổn định ở mức \textbf{29.357 ms} (cho hướng Site B) và \textbf{28.053 ms} (cho hướng Site C). Đây là bằng chứng thép cho thấy toàn bộ kiến trúc 3 mô hình LAN và mạng lõi MPLS Backbone đã được cấu hình thành công, không hề xảy ra nghẽn mạng hay vòng lặp định tuyến. Mọi chi nhánh đều có thể giao tiếp với nhau trơn tru như một mạng nội bộ duy nhất.

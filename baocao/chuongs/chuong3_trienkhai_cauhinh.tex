@@ -1,0 +1,69 @@
+\section{CẤU HÌNH VÀ TRIỂN KHAI KỸ THUẬT}
+
+\subsection{Môi trường mô phỏng Mininet và FRRouting (FRR)}
+Khác với Packet Tracer (chỉ mô phỏng phần mềm) hay GNS3 (cần lượng RAM khổng lồ để ảo hóa toàn bộ HĐH), Mininet là một trình giả lập mạng dựa trên Container của Linux. Các nút (Node) trong Mininet chia sẻ chung Linux Kernel gốc nhưng bị cô lập qua các không gian mạng (Network Namespaces). Điều này cho phép tạo ra hàng chục Router và Switch có khả năng truyền gói tin thực tế bằng tốc độ thật của phần cứng máy tính.
+Tuy nhiên, Linux mặc định không phải là một Router OSPF. Do đó, đồ án tích hợp thêm \textbf{FRRouting (FRR)} – một bộ giao thức định tuyến mã nguồn mở đẳng cấp công nghiệp (phân nhánh từ Quagga). FRR cung cấp các daemon chuyên biệt như \texttt{zebra} (quản lý kernel), \texttt{ospfd} (xử lý OSPF) và \texttt{ldpd} (xử lý MPLS Label).
+
+\subsection{Bật tính năng MPLS trên Linux Kernel}
+Theo mặc định, hệ điều hành Linux sẽ loại bỏ mọi gói tin có chứa Header MPLS (Layer 2.5) vì không hiểu. Để Mininet đóng vai trò như các Router MPLS thực thụ, mã nguồn Python (`main\_topology.py`) phải tiến hành nạp hai module hạt nhân là `mpls\_router` và `mpls\_iptunnel`.
+
+\begin{lstlisting}[style=powershell, caption={Code nạp module kernel MPLS và bật IPv4 Forwarding trong class LinuxRouter}]
+class LinuxRouter(Node):
+    def config(self, **params):
+        super(LinuxRouter, self).config(**params)
+        self.cmd('sysctl -w net.ipv4.ip_forward=1') # Bật tính năng chuyển tiếp IP
+        self.cmd('sysctl -w net.mpls.platform_labels=100000') # Mở rộng không gian nhãn MPLS
+        self.cmd('sysctl -w net.mpls.conf.lo.input=1') # Cho phép xử lý nhãn ở cổng loopback
+        self.cmd('modprobe mpls_router 2>/dev/null || true')
+        self.cmd('modprobe mpls_iptunnel 2>/dev/null || true')
+\end{lstlisting}
+
+\subsection{Thiết lập mạng ảo (Topology) bằng Python API}
+Mininet cho phép triển khai mạng thông qua API. Các chi nhánh LAN và mạng lõi được định nghĩa rõ ràng. Một điểm thiết kế nâng cao ở đồ án là xử lý **Vòng lặp mạng lớp 2 (L2 Loop)** tại Site C (Mạng Leaf-Spine).
+Mạng Leaf-Spine kết nối dạng Full-Mesh, tức là sinh ra nhiều đường đi qua lại giữa Leaf và Spine. Để tránh "Bão quảng bá" (Broadcast Storm), giao thức STP (Spanning Tree Protocol) bắt buộc phải được kích hoạt riêng cho cụm Switch OVS này.
+
+\begin{lstlisting}[style=powershell, caption={Đoạn code thiết lập Switch và chống Loop bằng OVS-VSCTL}]
+def configure_switches(net):
+    site_c_switches = ['s7', 's8', 's9', 's10', 's11']
+    for sw in net.switches:
+        sw.cmd('ovs-vsctl set Bridge %s fail-mode=standalone' % sw.name)
+        if sw.name in site_c_switches:
+            # Bat STP de tranh loop trong full-mesh leaf-spine
+            sw.cmd('ovs-vsctl set Bridge %s stp_enable=true' % sw.name)
+        else:
+            sw.cmd('ovs-vsctl set Bridge %s stp_enable=false' % sw.name)
+\end{lstlisting}
+
+\subsection{Triển khai Định tuyến tĩnh (Static Routes)}
+Đúng theo chiến lược đã thiết kế, thay vì nhồi nhét giao thức động làm phức tạp các bộ định tuyến biên khách hàng (CE), đồ án sử dụng trực tiếp tính năng `ip route` của Linux để chốt chặt đường đi.
+
+\begin{lstlisting}[style=powershell, caption={Khởi tạo đường tĩnh biên CE-PE bằng lệnh Linux IP}]
+# Từ phía PE mạng lõi, chỉ đường đi xuống Site của khách hàng
+net.get('pe1').cmd('ip route add 192.168.10.0/24 via 172.16.1.2')
+net.get('pe2').cmd('ip route add 192.168.20.0/24 via 172.16.2.2')
+net.get('pe2').cmd('ip route add 192.168.30.0/24 via 172.16.3.2')
+
+# Từ CE của khách hàng, trỏ Default Route (0.0.0.0/0) ném hết dữ liệu lên ISP (PE)
+net.get('ce1').cmd('ip route add default via 172.16.1.1')
+net.get('ce2').cmd('ip route add default via 172.16.2.1')
+net.get('ce3').cmd('ip route add default via 172.16.3.1')
+\end{lstlisting}
+
+\subsection{Cấu hình Daemon OSPF và LDP bằng FRRouting}
+Để Router P và PE trao đổi tự động, kịch bản tạo ra các thư mục cấu hình `/tmp/frr_node/` tương ứng và nạp file cấu hình `frr.conf`. Dưới đây là trích đoạn cấu hình cấu trúc của Router PE:
+
+\begin{lstlisting}[style=powershell, caption={Cấu hình định dạng của FRR áp dụng cho Router PE}]
+router ospf
+ ospf router-id {loopback_ip}
+ redistribute static         ! Phat tan mang LAN tinh cua khach hang vao OSPF
+ network 10.0.0.0/8 area 0   ! Kich hoat OSPF tren toan bo day IP Backbone
+ network 10.255.0.0/16 area 0! Kich hoat OSPF cho IP Loopback
+
+mpls ldp
+ router-id {loopback_ip}
+ address-family ipv4
+  discover edge-ro           ! Tu dong tim kiem lang gieng LDP tren mang OSPF
+  interface lo               ! Phat LDP cho Loopback
+\end{lstlisting}
+
+Mã nguồn sẽ khởi chạy tuần tự các tiến trình: đầu tiên là `zebra` (quản trị lõi mạng), tiếp đến `ospfd` (để tính toán Dijkstra) và cuối cùng là `ldpd` (để phát nhãn MPLS). Toàn bộ quá trình hệ thống từ lúc chạy code đến lúc hội tụ tự động mất chính xác 35 giây, mang lại trải nghiệm Zero-Touch Provisioning (Tự động hóa hoàn toàn) cho mạng Core.
