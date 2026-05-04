@@ -3,100 +3,124 @@ from pptx import Presentation
 from pptx.util import Inches, Pt
 from pptx.enum.text import PP_ALIGN
 
+# Tu dong xac dinh thu muc goc cua du an
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+PROJECT_ROOT = os.path.dirname(SCRIPT_DIR)
+
+def add_slide_with_image(prs, title_text, bullet_points, img_path=None):
+    """Helper function to create a slide with text on the left and image on the right"""
+    slide = prs.slides.add_slide(prs.slide_layouts[1])
+    slide.shapes.title.text = title_text
+    
+    # Text box (left side)
+    content = slide.placeholders[1]
+    content.text = "\n".join(bullet_points)
+    
+    # Adjust content box size to make room for image
+    content.width = Inches(4.5)
+    
+    # Add image if exists
+    if img_path and os.path.exists(img_path):
+        try:
+            prs.slides[-1].shapes.add_picture(img_path, Inches(4.8), Inches(1.5), width=Inches(4.8))
+        except Exception as e:
+            print(f"  [WARN] Khong the add anh {img_path}: {e}")
+    else:
+        # Placeholder or warning if image missing
+        txBox = slide.shapes.add_textbox(Inches(5.5), Inches(3), Inches(3), Inches(1))
+        tf = txBox.text_frame
+        tf.text = f"[Thieu anh: {os.path.basename(img_path) if img_path else 'N/A'}]"
+
 def create_presentation():
     prs = Presentation()
+    # Duong dan thu muc anh
+    img_dir = os.path.join(PROJECT_ROOT, "baocao", "image")
+    docs_dir = os.path.join(PROJECT_ROOT, "docs")
+    save_path = os.path.join(PROJECT_ROOT, "baocao", "thuyet_minh_do_an.pptx")
 
     # Slide 1: Title
     slide = prs.slides.add_slide(prs.slide_layouts[0])
     title = slide.shapes.title
     subtitle = slide.placeholders[1]
     title.text = "BÁO CÁO ĐỒ ÁN THIẾT KẾ MẠNG"
-    subtitle.text = "Đề tài: Thiết kế và triển khai mạng Metro Ethernet sử dụng MPLS\nSinh viên: Huỳnh Nguyễn Quốc Việt - 52300267\nGVHD: ThS. Lê Viết Thanh"
+    subtitle.text = "Đề tài: Thiết kế và triển khai mạng Metro Ethernet sử dụng MPLS\nSinh viên: Huỳnh Nguyễn Quốc Việt - 52300267\nNgành: Mạng máy tính và truyền thông dữ liệu"
 
-    # Slide 2: Cấu trúc thư mục dự án
+    # Slide 2: Muc tieu do an
     slide = prs.slides.add_slide(prs.slide_layouts[1])
-    slide.shapes.title.text = "1. Cấu trúc thư mục & Tổ chức mã nguồn"
+    slide.shapes.title.text = "1. Mục tiêu và Phạm vi nghiên cứu"
     content = slide.placeholders[1]
     content.text = (
-        "- tkm_cuoi_ky_52300267/\n"
-        "  + configs/: Chứa các file cấu hình mẫu (Templates) cho FRR (OSPF, LDP).\n"
-        "  + scripts/: Các công cụ tự động hóa (Vẽ sơ đồ, Đo hiệu năng).\n"
-        "  + baocao/: Toàn bộ mã nguồn LaTeX của bài báo cáo.\n"
-        "  + main_topology.py: File logic chính để xây dựng mạng trên Mininet.\n"
-        "- Lý do chọn: Kiến trúc Modular, tách biệt giữa Logic mạng và Cấu hình dịch vụ."
+        "- Xây dựng mô hình Metro Ethernet MAN kết nối đa chi nhánh.\n"
+        "- Triển khai kỹ thuật chuyển mạch nhãn MPLS (Multiprotocol Label Switching).\n"
+        "- So sánh hiệu năng giữa 3 kiến trúc LAN: Flat, 3-Tier và Leaf-Spine.\n"
+        "- Đánh giá khả năng mở rộng và tính bảo mật của mạng lõi ISP."
     )
 
-    # Slide 3: Sơ đồ mạng tổng thể
+    # Slide 3: So do Topology (Minh chung thiet ke)
+    topo_img = os.path.join(docs_dir, "network_detailed_topology.png")
+    add_slide_with_image(prs, "2. Thiết kế Topology hệ thống", [
+        "- ISP Core: Router P1, P2 chạy OSPF/LDP.",
+        "- ISP Edge: Router PE1, PE2 kết nối khách hàng.",
+        "- Site A: Flat Network (Mô hình doanh nghiệp nhỏ).",
+        "- Site B: Core-Dist-Access (Mô hình tiêu chuẩn).",
+        "- Site C: Leaf-Spine (Mô hình Data Center)."
+    ], topo_img)
+
+    # Slide 4: Khoi tao he thong (Minh chung Mininet)
+    mininet_img = os.path.join(img_dir, "mininet_nodes_net.png")
+    add_slide_with_image(prs, "3. Hiện thực hóa trên Mininet", [
+        "- Sử dụng LinuxRouter và OVS Switches.",
+        "- Cấu hình STP cho Site C để chống Loop lớp 2.",
+        "- Quy hoạch IP khoa học: /30 cho Backbone, /24 cho LAN.",
+        "- Kiểm tra Nodes/Net: Đầy đủ 11 Switch, 7 Router và 10 Hosts."
+    ], mininet_img)
+
+    # Slide 5: Minh chung Dinh tuyen (OSPF & MPLS)
+    ospf_img = os.path.join(img_dir, "ospf_neighbor.png")
+    add_slide_with_image(prs, "4. Minh chứng Hội tụ định tuyến", [
+        "- OSPF đạt trạng thái FULL giữa P và PE.",
+        "- LDP phát nhãn tự động cho các dải Loopback và LAN.",
+        "- Bảng định tuyến xuất hiện 'Label' (24, 25, implicit-null).",
+        "- Chứng minh dữ liệu đi qua hầm MPLS thay vì IP thuần."
+    ], ospf_img)
+
+    # Slide 6: Minh chung Thong mach & Bao mat
+    trace_img = os.path.join(img_dir, "traceroute_mpls.png")
+    add_slide_with_image(prs, "5. Kiểm tra kết nối & Tính ẩn danh", [
+        "- Ping xuyên chi nhánh: Đạt 0% Loss, RTT ổn định.",
+        "- Traceroute: Xuất hiện dấu * * * tại các hop mạng lõi.",
+        "- Giải thích: Tính năng ẩn IP của MPLS giúp bảo mật hạ tầng ISP."
+    ], trace_img)
+
+    # Slide 7: Phan tich hieu nang (Bieu do Throughput)
+    throughput_img = os.path.join(img_dir, "chart_throughput.png")
+    add_slide_with_image(prs, "6. Đánh giá Thông lượng (Throughput)", [
+        "- Site B -> Site C (Nội bộ PE): Đạt băng thông cao nhất (~189Mbps).",
+        "- Site A -> Site B (Xuyên lõi): Bị giới hạn bởi nút thắt WAN (~100Mbps).",
+        "- Leaf-Spine thể hiện sự ổn định vượt trội khi có lưu lượng cao."
+    ], throughput_img)
+
+    # Slide 8: Phan tich hieu nang (Bieu do Delay)
+    delay_img = os.path.join(img_dir, "chart_delay.png")
+    add_slide_with_image(prs, "7. Phân tích Độ trễ (RTT)", [
+        "- Độ trễ trung bình duy trì mức 20ms - 27ms.",
+        "- MPLS giúp giảm Overhead xử lý tại Core Router.",
+        "- Kiến trúc LAN phân tầng giúp tăng tính sẵn sàng (Availability)."
+    ], delay_img)
+
+    # Slide 9: Ket luan
     slide = prs.slides.add_slide(prs.slide_layouts[1])
-    slide.shapes.title.text = "2. Sơ đồ mạng & Kiến trúc hệ thống"
+    slide.shapes.title.text = "8. Tổng kết đồ án"
     content = slide.placeholders[1]
     content.text = (
-        "- MPLS Backbone: Gồm 2 Router lõi (P) và 2 Router biên (PE).\n"
-        "- 3 Chi nhánh (Sites) với 3 kiến trúc LAN đặc thù:\n"
-        "  + Site A: Flat Network (Đơn giản).\n"
-        "  + Site B: 3-Tier Architecture (Core-Dist-Access).\n"
-        "  + Site C: Leaf-Spine Architecture (Hiện đại, tối ưu cho Data Center).\n"
-        "- Kết nối: Các chi nhánh kết nối về ISP qua đường truyền WAN 100Mbps."
+        "- Hoàn thành 100% mục tiêu thiết kế và triển khai.\n"
+        "- Hệ thống tự động hóa hoàn toàn từ cấu hình đến đo lường.\n"
+        "- Nắm vững công nghệ chuyển mạch nhãn hiện đại nhất hiện nay.\n"
+        "- Hướng phát triển: Triển khai QoS và Traffic Engineering trên MPLS."
     )
 
-    # Slide 4: Chức năng các thiết bị
-    slide = prs.slides.add_slide(prs.slide_layouts[1])
-    slide.shapes.title.text = "3. Vai trò các thiết bị trong hệ thống"
-    content = slide.placeholders[1]
-    content.text = (
-        "- Router P (Provider): Chuyển mạch nhãn tốc độ cao trong mạng lõi.\n"
-        "- Router PE (Provider Edge): Gán/Gỡ nhãn (Push/Pop) khi dữ liệu vào/ra mạng lõi.\n"
-        "- Router CE (Customer Edge): Định tuyến tĩnh, làm Gateway cho mạng LAN.\n"
-        "- Switches: OVS Switches giả lập L2, Site C bật STP để chống Loop.\n"
-        "- Hosts: Các máy trạm giả lập luồng dữ liệu (Ping, iPerf)."
-    )
-
-    # Slide 5: Chiến lược cấu hình
-    slide = prs.slides.add_slide(prs.slide_layouts[1])
-    slide.shapes.title.text = "4. Cách thức cấu hình hệ thống"
-    content = slide.placeholders[1]
-    content.text = (
-        "- Mạng lõi (P/PE): Chạy OSPF Area 0 để thông tuyến IP và LDP để trao đổi nhãn.\n"
-        "- Kết nối CE-PE: Sử dụng Định tuyến tĩnh (Static Route) trỏ về Default Gateway.\n"
-        "- Tự động hóa: Sử dụng Python để sinh file cấu hình FRR động từ Templates.\n"
-        "- Cơ chế Redistribution: PE quảng bá các đường mạng LAN của khách hàng vào OSPF thông qua lệnh 'redistribute kernel'."
-    )
-
-    # Slide 6: Kiểm tra kết nối & Chuyển mạch nhãn
-    slide = prs.slides.add_slide(prs.slide_layouts[1])
-    slide.shapes.title.text = "5. Kết quả kiểm tra & Ý nghĩa"
-    content = slide.placeholders[1]
-    content.text = (
-        "- Lệnh Ping: Đạt 0% Packet Loss giữa tất cả các Site (A, B, C).\n"
-        "- Lệnh Traceroute: Hiển thị sự hiện diện của nhãn MPLS tại các hop mạng lõi.\n"
-        "- Ý nghĩa: Chứng minh gói tin không đi theo định tuyến IP truyền thống mà đang được chuyển mạch nhãn nhanh chóng và an toàn."
-    )
-
-    # Slide 7: Phân tích hiệu năng
-    slide = prs.slides.add_slide(prs.slide_layouts[1])
-    slide.shapes.title.text = "6. Phân tích kết quả đo lường"
-    content = slide.placeholders[1]
-    content.text = (
-        "- Thông lượng (Throughput): Đạt ~100Mbps (xuyên Backbone) và ~190Mbps (nội bộ PE).\n"
-        "- Độ trễ (Delay): Ổn định ở mức ~26ms cho các chi nhánh cách xa nhau.\n"
-        "- So sánh: Leaf-Spine cho thấy băng thông ổn định nhất khi tải nặng.\n"
-        "- MPLS giúp giảm tải xử lý cho các Router lõi bằng cách gỡ nhãn tại chặng áp chót (PHP)."
-    )
-
-    # Slide 8: Kết luận
-    slide = prs.slides.add_slide(prs.slide_layouts[1])
-    slide.shapes.title.text = "7. Kết luận"
-    content = slide.placeholders[1]
-    content.text = (
-        "- Đồ án đã triển khai thành công mô hình Metro Ethernet MPLS thực tế.\n"
-        "- Giải quyết được bài toán kết nối đa chi nhánh có kiến trúc LAN khác biệt.\n"
-        "- Hệ thống hoạt động ổn định, hiệu năng cao và đáp ứng đủ các tiêu chuẩn kỹ thuật.\n"
-        "- Nắm vững kỹ năng sử dụng Mininet, FRRouting và các công cụ đo lường mạng."
-    )
-
-    save_path = "baocao/thuyet_minh_do_an.pptx"
     prs.save(save_path)
-    print(f"Presentation saved to {save_path}")
+    print(f"Presentation updated with evidence images: {save_path}")
 
 if __name__ == "__main__":
     create_presentation()

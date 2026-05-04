@@ -62,32 +62,5 @@ Mỗi chi nhánh doanh nghiệp tùy theo quy mô, mức độ quan trọng và 
     \end{itemize}
 \end{enumerate}
 
-\subsection{Minh chứng sơ bộ việc khởi tạo đúng Topology đề tài}
-Để khẳng định mô hình đã được xây dựng đúng chuẩn với những thiết kế lý thuyết ở trên, ngay sau khi khởi động hệ thống giả lập Mininet, ta sẽ kiểm tra toàn bộ danh sách các Node và các Link (đường truyền) kết nối giữa chúng.
 
-\begin{figure}[H]
-    \centering
-    % [NOTE] TRONG TERMINAL MININET, GÕ LỆNH `nodes` VÀ `net`. CHỤP ẢNH MÀN HÌNH CHỨA KẾT QUẢ CỦA 2 LỆNH NÀY VÀ LƯU VÀO FOLDER image/ TÊN LÀ mininet_nodes_net.png
-    \includegraphics[width=0.8\textwidth]{image/mininet_nodes_net.png}
-    \caption{Danh sách thiết bị (Nodes) và Liên kết mạng (Net) trên Mininet}
-    \label{fig:mininet_nodes}
-\end{figure}
 
-\textit{\textbf{Giải thích minh chứng:}} Từ kết quả lệnh \texttt{nodes} và \texttt{net}, ta thấy rõ hệ thống đã khởi tạo đủ 17 Hosts (bao gồm các Router P1, P2, PE1, PE2, CE1, CE2, CE3 và các máy trạm hA1-hA3, hB1-hB4, hC1-hC3) cùng với 11 Switch mạng (từ s1 đến s11). Lệnh \texttt{net} minh họa chính xác các cáp nối vật lý ảo giữa chúng, đảm bảo cấu trúc Topology được thiết lập một cách hoàn hảo:
-\begin{itemize}
-    \item Site A kết nối qua Switch phẳng \texttt{s1} (với hA1, hA2, hA3).
-    \item Site B nối phân cấp 3 lớp chuẩn mực từ Router CE2 xuống Core \texttt{s2}, rẽ nhánh sang Distribution \texttt{s3, s4} và đổ xuống Access \texttt{s5, s6} chứa các máy trạm hB.
-    \item Và đặc biệt nhất là Site C được đấu chéo dạng lưới Full-Mesh giữa các Spine (\texttt{s7, s8}) và các Leaf (\texttt{s9, s10, s11}) đúng với lý thuyết đã trình bày (có thể thấy rõ các đường nối như \texttt{s7-eth2:s9-eth1}, \texttt{s8-eth1:s9-eth2}).
-\end{itemize}
-
-Sau khi đảm bảo thiết bị đã đầy đủ, ta tiến hành gửi gói tin ICMP (Ping) liên tục từ Site A đến Site B và Site C để chứng minh toàn mạng thông suốt:
-
-\begin{figure}[H]
-    \centering
-    % [NOTE] TRONG TERMINAL MININET, GÕ LỆNH `hA1 ping -c 8 192.168.20.11` VÀ `hA1 ping -c 8 192.168.30.11` (Chờ mạng hội tụ 35 giây trước khi gõ). CHỤP MÀN HÌNH 2 KẾT QUẢ NÀY (ĐẠT 0% LOSS) LƯU VÀO image/ TÊN LÀ ping_toan_mang.png
-    \includegraphics[width=0.8\textwidth]{image/ping_toan_mang.png}
-    \caption{Kiểm tra thông mạch toàn mạng bằng 8 gói tin Ping}
-    \label{fig:ping_toan_mang}
-\end{figure}
-
-\textit{\textbf{Giải thích minh chứng:}} Lệnh Ping với tham số \texttt{-c 8} ép hệ thống gửi liên tục 8 gói tin giữa các chi nhánh ở xa nhau. Ở kết quả trả về thực tế, gói tin đi từ hA1 (Site A) sang hB1 (Site B - IP 192.168.20.11) và từ hA1 sang hC1 (Site C - IP 192.168.30.11) đều nhận được \textbf{8 phản hồi (8 received)} và cho ra \textbf{0\% packet loss}. Độ trễ (RTT) trung bình duy trì cực kỳ ổn định ở mức \textbf{29.357 ms} (cho hướng Site B) và \textbf{28.053 ms} (cho hướng Site C). Đây là bằng chứng thép cho thấy toàn bộ kiến trúc 3 mô hình LAN và mạng lõi MPLS Backbone đã được cấu hình thành công, không hề xảy ra nghẽn mạng hay vòng lặp định tuyến. Mọi chi nhánh đều có thể giao tiếp với nhau trơn tru như một mạng nội bộ duy nhất.

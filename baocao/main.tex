@@ -64,6 +64,7 @@
 \captionsetup[table]{labelsep=space}
 
 \usepackage{tabularx}
+\usepackage{array}
 \newcolumntype{s}{>{\hsize=.3\hsize}X}
 \newcolumntype{y}{>{\hsize=.4\hsize}X}
 \newcolumntype{d}{>{\hsize=.1\hsize}X}
@@ -215,12 +216,8 @@ THIẾT KẾ VÀ TRIỂN KHAI MẠNG METRO ETHERNET\\SỬ DỤNG MPLS}
         	
 % \newpage
 \clearpage
- %---------------Phần tài liệu tham khả sử dụng dạng APA như thầy ví trong phần đầu chương 1 như "(\cite{smith2020}})" và nội dung phải cite phải tạo như trong "tailieuthamkhao.bib".
-\newpage	
-\phantomsection\addcontentsline{toc}{section}{\numberline {}TÀI LIỆU THAM KHẢO}
+\include{chuongs/chuong6_tailieuthamkhao}
 
-%\bibliography{tailieuthamkhao}
-%\newpage
 % \input{appendix} % Phụ lục nếu có
 	
 \end{document}

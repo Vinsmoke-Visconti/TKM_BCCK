@@ -1,0 +1,168 @@
+<mxfile host="app.diagrams.net" modified="2024-05-04T00:00:00.000Z" agent="Manual" version="21.0.0" type="device">
+  <diagram id="network_topo" name="Metro Ethernet MPLS Topology">
+    <mxGraphModel dx="1422" dy="794" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- Vùng ISP Backbone -->
+        <mxCell id="bg_isp" value="ISP BACKBONE (MPLS / OSPF Area 0)" style="swimlane;whiteSpace=wrap;html=1;fillColor=#111822;strokeColor=#E74C3C;startSize=23;fontColor=#ffffff;separatorColor=none;" vertex="1" parent="1">
+          <mxGeometry x="280" y="40" width="600" height="260" as="geometry" />
+        </mxCell>
+
+        <!-- Router Core P -->
+        <mxCell id="P1" value="P1 (Core)" style="verticalLabelPosition=bottom;html=1;verticalAlign=top;aspect=fixed;align=center;pointerEvents=1;shape=mxgraph.cisco.routers.router;fillColor=#E74C3C;strokeColor=#ffffff;" vertex="1" parent="bg_isp">
+          <mxGeometry x="150" y="50" width="70" height="58" as="geometry" />
+        </mxCell>
+        <mxCell id="P2" value="P2 (Core)" style="verticalLabelPosition=bottom;html=1;verticalAlign=top;aspect=fixed;align=center;pointerEvents=1;shape=mxgraph.cisco.routers.router;fillColor=#E74C3C;strokeColor=#ffffff;" vertex="1" parent="bg_isp">
+          <mxGeometry x="380" y="50" width="70" height="58" as="geometry" />
+        </mxCell>
+
+        <!-- Router Provider Edge PE -->
+        <mxCell id="PE1" value="PE1 (Edge)" style="verticalLabelPosition=bottom;html=1;verticalAlign=top;aspect=fixed;align=center;pointerEvents=1;shape=mxgraph.cisco.routers.router;fillColor=#E67E22;strokeColor=#ffffff;" vertex="1" parent="bg_isp">
+          <mxGeometry x="50" y="160" width="70" height="58" as="geometry" />
+        </mxCell>
+        <mxCell id="PE2" value="PE2 (Edge)" style="verticalLabelPosition=bottom;html=1;verticalAlign=top;aspect=fixed;align=center;pointerEvents=1;shape=mxgraph.cisco.routers.router;fillColor=#E67E22;strokeColor=#ffffff;" vertex="1" parent="bg_isp">
+          <mxGeometry x="480" y="160" width="70" height="58" as="geometry" />
+        </mxCell>
+
+        <!-- Links Core ISP -->
+        <mxCell id="link_p1_p2" value="10.0.12.0/30" style="endArrow=none;html=1;strokeWidth=3;strokeColor=#E74C3C;fontColor=#ffffff;labelBackgroundColor=none;" edge="1" parent="bg_isp" source="P1" target="P2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="link_pe1_p1" value="10.0.13.0/30" style="endArrow=none;html=1;strokeWidth=2;strokeColor=#E67E22;fontColor=#ffffff;" edge="1" parent="bg_isp" source="PE1" target="P1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="link_pe2_p2" value="10.0.24.0/30" style="endArrow=none;html=1;strokeWidth=2;strokeColor=#E67E22;fontColor=#ffffff;" edge="1" parent="bg_isp" source="PE2" target="P2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Router Customer Edge CE -->
+        <mxCell id="CE1" value="CE1 (Site A GW)" style="verticalLabelPosition=bottom;html=1;verticalAlign=top;aspect=fixed;align=center;pointerEvents=1;shape=mxgraph.cisco.routers.router;fillColor=#8E44AD;strokeColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="150" y="380" width="70" height="58" as="geometry" />
+        </mxCell>
+        <mxCell id="CE2" value="CE2 (Site B GW)" style="verticalLabelPosition=bottom;html=1;verticalAlign=top;aspect=fixed;align=center;pointerEvents=1;shape=mxgraph.cisco.routers.router;fillColor=#8E44AD;strokeColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="545" y="380" width="70" height="58" as="geometry" />
+        </mxCell>
+        <mxCell id="CE3" value="CE3 (Site C GW)" style="verticalLabelPosition=bottom;html=1;verticalAlign=top;aspect=fixed;align=center;pointerEvents=1;shape=mxgraph.cisco.routers.router;fillColor=#8E44AD;strokeColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="950" y="380" width="70" height="58" as="geometry" />
+        </mxCell>
+
+        <!-- WAN Links -->
+        <mxCell id="wan1" value="172.16.1.0/30" style="endArrow=none;html=1;strokeColor=#8E44AD;strokeWidth=2;" edge="1" parent="1" source="CE1" target="PE1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="wan2" value="172.16.2.0/30" style="endArrow=none;html=1;strokeColor=#8E44AD;strokeWidth=2;" edge="1" parent="1" source="CE2" target="PE2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="wan3" value="172.16.3.0/30" style="endArrow=none;html=1;strokeColor=#8E44AD;strokeWidth=2;" edge="1" parent="1" source="CE3" target="PE2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- SITE A (FLAT) -->
+        <mxCell id="bg_siteA" value="Site A: Flat Network" style="swimlane;whiteSpace=wrap;html=1;fillColor=#112222;strokeColor=#16A085;startSize=23;fontColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="40" y="480" width="300" height="280" as="geometry" />
+        </mxCell>
+        <mxCell id="s1" value="s1 (Switch)" style="verticalLabelPosition=bottom;html=1;verticalAlign=top;aspect=fixed;align=center;pointerEvents=1;shape=mxgraph.cisco.switches.workgroup_switch;fillColor=#16A085;strokeColor=#ffffff;" vertex="1" parent="bg_siteA">
+          <mxGeometry x="115" y="50" width="70" height="42" as="geometry" />
+        </mxCell>
+        <mxCell id="hA1" value="hA1" style="verticalLabelPosition=bottom;html=1;verticalAlign=top;aspect=fixed;align=center;pointerEvents=1;shape=mxgraph.cisco.computers_and_peripherals.pc;" vertex="1" parent="bg_siteA">
+          <mxGeometry x="30" y="160" width="50" height="42" as="geometry" />
+        </mxCell>
+        <mxCell id="hA2" value="hA2" style="verticalLabelPosition=bottom;html=1;verticalAlign=top;aspect=fixed;align=center;pointerEvents=1;shape=mxgraph.cisco.computers_and_peripherals.pc;" vertex="1" parent="bg_siteA">
+          <mxGeometry x="125" y="160" width="50" height="42" as="geometry" />
+        </mxCell>
+        <mxCell id="hA3" value="hA3" style="verticalLabelPosition=bottom;html=1;verticalAlign=top;aspect=fixed;align=center;pointerEvents=1;shape=mxgraph.cisco.computers_and_peripherals.pc;" vertex="1" parent="bg_siteA">
+          <mxGeometry x="220" y="160" width="50" height="42" as="geometry" />
+        </mxCell>
+        <mxCell id="l_ce1_s1" style="endArrow=none;html=1;strokeColor=#16A085;strokeWidth=2;" edge="1" parent="1" source="CE1" target="s1" />
+        <mxCell id="l_s1_hA1" style="endArrow=none;html=1;" edge="1" parent="bg_siteA" source="s1" target="hA1" />
+        <mxCell id="l_s1_hA2" style="endArrow=none;html=1;" edge="1" parent="bg_siteA" source="s1" target="hA2" />
+        <mxCell id="l_s1_hA3" style="endArrow=none;html=1;" edge="1" parent="bg_siteA" source="s1" target="hA3" />
+
+        <!-- SITE B (3-TIER) -->
+        <mxCell id="bg_siteB" value="Site B: 3-Tier Network" style="swimlane;whiteSpace=wrap;html=1;fillColor=#112233;strokeColor=#2980B9;startSize=23;fontColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="400" y="480" width="360" height="320" as="geometry" />
+        </mxCell>
+        <mxCell id="s2" value="s2 (Core)" style="verticalLabelPosition=bottom;html=1;verticalAlign=top;aspect=fixed;align=center;pointerEvents=1;shape=mxgraph.cisco.switches.workgroup_switch;fillColor=#2980B9;" vertex="1" parent="bg_siteB">
+          <mxGeometry x="145" y="40" width="70" height="42" as="geometry" />
+        </mxCell>
+        <mxCell id="s3" value="s3 (Dist)" style="verticalLabelPosition=bottom;html=1;verticalAlign=top;aspect=fixed;align=center;pointerEvents=1;shape=mxgraph.cisco.switches.workgroup_switch;fillColor=#27AE60;" vertex="1" parent="bg_siteB">
+          <mxGeometry x="60" y="110" width="70" height="42" as="geometry" />
+        </mxCell>
+        <mxCell id="s4" value="s4 (Dist)" style="verticalLabelPosition=bottom;html=1;verticalAlign=top;aspect=fixed;align=center;pointerEvents=1;shape=mxgraph.cisco.switches.workgroup_switch;fillColor=#27AE60;" vertex="1" parent="bg_siteB">
+          <mxGeometry x="230" y="110" width="70" height="42" as="geometry" />
+        </mxCell>
+        <mxCell id="s5" value="s5 (Access)" style="verticalLabelPosition=bottom;html=1;verticalAlign=top;aspect=fixed;align=center;pointerEvents=1;shape=mxgraph.cisco.switches.workgroup_switch;fillColor=#16A085;" vertex="1" parent="bg_siteB">
+          <mxGeometry x="60" y="180" width="70" height="42" as="geometry" />
+        </mxCell>
+        <mxCell id="s6" value="s6 (Access)" style="verticalLabelPosition=bottom;html=1;verticalAlign=top;aspect=fixed;align=center;pointerEvents=1;shape=mxgraph.cisco.switches.workgroup_switch;fillColor=#16A085;" vertex="1" parent="bg_siteB">
+          <mxGeometry x="230" y="180" width="70" height="42" as="geometry" />
+        </mxCell>
+        <mxCell id="hB1" value="hB1" style="verticalLabelPosition=bottom;html=1;verticalAlign=top;aspect=fixed;align=center;pointerEvents=1;shape=mxgraph.cisco.computers_and_peripherals.pc;" vertex="1" parent="bg_siteB">
+          <mxGeometry x="30" y="250" width="45" height="38" as="geometry" />
+        </mxCell>
+        <mxCell id="hB2" value="hB2" style="verticalLabelPosition=bottom;html=1;verticalAlign=top;aspect=fixed;align=center;pointerEvents=1;shape=mxgraph.cisco.computers_and_peripherals.pc;" vertex="1" parent="bg_siteB">
+          <mxGeometry x="100" y="250" width="45" height="38" as="geometry" />
+        </mxCell>
+        <mxCell id="hB3" value="hB3" style="verticalLabelPosition=bottom;html=1;verticalAlign=top;aspect=fixed;align=center;pointerEvents=1;shape=mxgraph.cisco.computers_and_peripherals.pc;" vertex="1" parent="bg_siteB">
+          <mxGeometry x="210" y="250" width="45" height="38" as="geometry" />
+        </mxCell>
+        <mxCell id="hB4" value="hB4" style="verticalLabelPosition=bottom;html=1;verticalAlign=top;aspect=fixed;align=center;pointerEvents=1;shape=mxgraph.cisco.computers_and_peripherals.pc;" vertex="1" parent="bg_siteB">
+          <mxGeometry x="285" y="250" width="45" height="38" as="geometry" />
+        </mxCell>
+
+        <mxCell id="l_ce2_s2" style="endArrow=none;html=1;strokeColor=#2980B9;strokeWidth=2;" edge="1" parent="1" source="CE2" target="s2" />
+        <mxCell id="l_s2_s3" style="endArrow=none;html=1;strokeColor=#2980B9;" edge="1" parent="bg_siteB" source="s2" target="s3" />
+        <mxCell id="l_s2_s4" style="endArrow=none;html=1;strokeColor=#2980B9;" edge="1" parent="bg_siteB" source="s2" target="s4" />
+        <mxCell id="l_s3_s5" style="endArrow=none;html=1;strokeColor=#27AE60;" edge="1" parent="bg_siteB" source="s3" target="s5" />
+        <mxCell id="l_s4_s6" style="endArrow=none;html=1;strokeColor=#27AE60;" edge="1" parent="bg_siteB" source="s4" target="s6" />
+        <mxCell id="l_s5_hB1" style="endArrow=none;html=1;" edge="1" parent="bg_siteB" source="s5" target="hB1" />
+        <mxCell id="l_s5_hB2" style="endArrow=none;html=1;" edge="1" parent="bg_siteB" source="s5" target="hB2" />
+        <mxCell id="l_s6_hB3" style="endArrow=none;html=1;" edge="1" parent="bg_siteB" source="s6" target="hB3" />
+        <mxCell id="l_s6_hB4" style="endArrow=none;html=1;" edge="1" parent="bg_siteB" source="s6" target="hB4" />
+
+        <!-- SITE C (LEAF-SPINE) -->
+        <mxCell id="bg_siteC" value="Site C: Leaf-Spine" style="swimlane;whiteSpace=wrap;html=1;fillColor=#221111;strokeColor=#D35400;startSize=23;fontColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="820" y="480" width="320" height="280" as="geometry" />
+        </mxCell>
+        <mxCell id="s7" value="s7 (Spine)" style="verticalLabelPosition=bottom;html=1;verticalAlign=top;aspect=fixed;align=center;pointerEvents=1;shape=mxgraph.cisco.switches.workgroup_switch;fillColor=#D35400;" vertex="1" parent="bg_siteC">
+          <mxGeometry x="60" y="50" width="70" height="42" as="geometry" />
+        </mxCell>
+        <mxCell id="s8" value="s8 (Spine)" style="verticalLabelPosition=bottom;html=1;verticalAlign=top;aspect=fixed;align=center;pointerEvents=1;shape=mxgraph.cisco.switches.workgroup_switch;fillColor=#D35400;" vertex="1" parent="bg_siteC">
+          <mxGeometry x="190" y="50" width="70" height="42" as="geometry" />
+        </mxCell>
+        <mxCell id="s9" value="s9 (Leaf)" style="verticalLabelPosition=bottom;html=1;verticalAlign=top;aspect=fixed;align=center;pointerEvents=1;shape=mxgraph.cisco.switches.workgroup_switch;fillColor=#F39C12;" vertex="1" parent="bg_siteC">
+          <mxGeometry x="30" y="130" width="70" height="42" as="geometry" />
+        </mxCell>
+        <mxCell id="s10" value="s10 (Leaf)" style="verticalLabelPosition=bottom;html=1;verticalAlign=top;aspect=fixed;align=center;pointerEvents=1;shape=mxgraph.cisco.switches.workgroup_switch;fillColor=#F39C12;" vertex="1" parent="bg_siteC">
+          <mxGeometry x="125" y="130" width="70" height="42" as="geometry" />
+        </mxCell>
+        <mxCell id="s11" value="s11 (Leaf)" style="verticalLabelPosition=bottom;html=1;verticalAlign=top;aspect=fixed;align=center;pointerEvents=1;shape=mxgraph.cisco.switches.workgroup_switch;fillColor=#F39C12;" vertex="1" parent="bg_siteC">
+          <mxGeometry x="220" y="130" width="70" height="42" as="geometry" />
+        </mxCell>
+        <mxCell id="hC1" value="hC1" style="verticalLabelPosition=bottom;html=1;verticalAlign=top;aspect=fixed;align=center;pointerEvents=1;shape=mxgraph.cisco.computers_and_peripherals.pc;" vertex="1" parent="bg_siteC">
+          <mxGeometry x="40" y="210" width="50" height="42" as="geometry" />
+        </mxCell>
+        <mxCell id="hC2" value="hC2" style="verticalLabelPosition=bottom;html=1;verticalAlign=top;aspect=fixed;align=center;pointerEvents=1;shape=mxgraph.cisco.computers_and_peripherals.pc;" vertex="1" parent="bg_siteC">
+          <mxGeometry x="135" y="210" width="50" height="42" as="geometry" />
+        </mxCell>
+        <mxCell id="hC3" value="hC3" style="verticalLabelPosition=bottom;html=1;verticalAlign=top;aspect=fixed;align=center;pointerEvents=1;shape=mxgraph.cisco.computers_and_peripherals.pc;" vertex="1" parent="bg_siteC">
+          <mxGeometry x="230" y="210" width="50" height="42" as="geometry" />
+        </mxCell>
+
+        <mxCell id="l_ce3_s7" style="endArrow=none;html=1;strokeColor=#D35400;strokeWidth=2;" edge="1" parent="1" source="CE3" target="s7" />
+        <mxCell id="l_s7_s9" style="endArrow=none;html=1;strokeColor=#F39C12;" edge="1" parent="bg_siteC" source="s7" target="s9" />
+        <mxCell id="l_s7_s10" style="endArrow=none;html=1;strokeColor=#F39C12;" edge="1" parent="bg_siteC" source="s7" target="s10" />
+        <mxCell id="l_s7_s11" style="endArrow=none;html=1;strokeColor=#F39C12;" edge="1" parent="bg_siteC" source="s7" target="s11" />
+        <mxCell id="l_s8_s9" style="endArrow=none;html=1;strokeColor=#F39C12;" edge="1" parent="bg_siteC" source="s8" target="s9" />
+        <mxCell id="l_s8_s10" style="endArrow=none;html=1;strokeColor=#F39C12;" edge="1" parent="bg_siteC" source="s8" target="s10" />
+        <mxCell id="l_s8_s11" style="endArrow=none;html=1;strokeColor=#F39C12;" edge="1" parent="bg_siteC" source="s8" target="s11" />
+        <mxCell id="l_s9_hC1" style="endArrow=none;html=1;" edge="1" parent="bg_siteC" source="s9" target="hC1" />
+        <mxCell id="l_s10_hC2" style="endArrow=none;html=1;" edge="1" parent="bg_siteC" source="s10" target="hC2" />
+        <mxCell id="l_s11_hC3" style="endArrow=none;html=1;" edge="1" parent="bg_siteC" source="s11" target="hC3" />
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
