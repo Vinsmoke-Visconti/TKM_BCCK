@@ -19,7 +19,7 @@ class LinuxRouter(Node):
 \end{lstlisting}
 
 \subsection{Thiết lập mạng ảo (Topology) bằng Python API}
-Mininet cho phép triển khai mạng thông qua API. Các chi nhánh LAN và mạng lõi được định nghĩa rõ ràng. Một điểm thiết kế nâng cao ở đồ án là xử lý **Vòng lặp mạng lớp 2 (L2 Loop)** tại Site C (Mạng Leaf-Spine).
+Mininet cho phép triển khai mạng thông qua API. Các chi nhánh LAN và mạng lõi được định nghĩa rõ ràng. Một điểm thiết kế nâng cao ở đồ án là xử lý \textbf{Vòng lặp mạng lớp 2 (L2 Loop)} tại Site C (Mạng Leaf-Spine).
 Mạng Leaf-Spine kết nối dạng Full-Mesh, tức là sinh ra nhiều đường đi qua lại giữa Leaf và Spine. Để tránh "Bão quảng bá" (Broadcast Storm), giao thức STP (Spanning Tree Protocol) bắt buộc phải được kích hoạt riêng cho cụm Switch OVS này.
 
 \begin{lstlisting}[style=powershell, caption={Đoạn code thiết lập Switch và chống Loop bằng OVS-VSCTL}]
@@ -57,13 +57,18 @@ router ospf
  ospf router-id {loopback_ip}
  redistribute static         ! Phat tan mang LAN tinh cua khach hang vao OSPF
  network 10.0.0.0/8 area 0   ! Kich hoat OSPF tren toan bo day IP Backbone
- network 10.255.0.0/16 area 0! Kich hoat OSPF cho IP Loopback
-
+ network 10.255.0.0/16 area 0 ! Kich hoat OSPF cho IP Loopback
+!
 mpls ldp
  router-id {loopback_ip}
  address-family ipv4
-  discover edge-ro           ! Tu dong tim kiem lang gieng LDP tren mang OSPF
-  interface lo               ! Phat LDP cho Loopback
+  discovery transport-address {loopback_ip}
+  interface lo               ! Phat LDP tren cong Loopback
+  interface {name}-eth0      ! Phat LDP tren cong noi vao Backbone
+ !
+!
+line vty
+!
 \end{lstlisting}
 
 Mã nguồn sẽ khởi chạy tuần tự các tiến trình: đầu tiên là `zebra` (quản trị lõi mạng), tiếp đến `ospfd` (để tính toán Dijkstra) và cuối cùng là `ldpd` (để phát nhãn MPLS). Toàn bộ quá trình hệ thống từ lúc chạy code đến lúc hội tụ tự động mất chính xác 35 giây, mang lại trải nghiệm Zero-Touch Provisioning (Tự động hóa hoàn toàn) cho mạng Core.

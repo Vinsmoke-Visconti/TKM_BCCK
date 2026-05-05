@@ -75,6 +75,7 @@ Sự kỳ diệu của mạng nằm ở tầng LDP:
     \item Dựa trên bảng định tuyến OSPF đã hoàn chỉnh, LDP tự động tạo ra một Nhãn (Label) cho mỗi dải IP đích, và gửi nhãn này báo cho các láng giềng.
     \item Khi gói tin từ chi nhánh A đi sang chi nhánh C: Tại cửa ngõ vào (PE1), gói tin bị đóng thêm nhãn (Push Label). Đến giữa đường (P1, P2), các router chỉ đọc nhãn, đổi nhãn khác (Swap) và ném đi chứ không phải mổ xẻ IP.
     \item Gần đến đích (P2), router chủ động tháo nhãn (Pop) nhờ cơ chế Penultimate Hop Popping (PHP) trước khi giao cho PE2, để PE2 đỡ tốn công xử lý, giúp gói tin đến Site C nhanh nhất có thể.
+\end{itemize}
 
 \subsection{Minh chứng sơ bộ việc khởi tạo đúng Topology đề tài}
 Để khẳng định mô hình đã được xây dựng đúng chuẩn với những thiết kế lý thuyết ở trên, ngay sau khi khởi động hệ thống giả lập Mininet, ta sẽ kiểm tra toàn bộ danh sách các Node và các Link (đường truyền) kết nối giữa chúng.

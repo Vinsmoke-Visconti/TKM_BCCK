@@ -175,11 +175,11 @@ THIẾT KẾ VÀ TRIỂN KHAI MẠNG METRO ETHERNET\\SỬ DỤNG MPLS}
 	\newpage
 	
 	%Tạo danh mục bảng biểu.
-	%{\let\oldnumberline\numberline
-		%\renewcommand{\numberline {Bảng~\oldnumberline}
-		%\listoftables}
-	%\phantomsection\addcontentsline{toc}{section}{\numberline {} DANH MỤC BẢNG BIỂU}
-	%\newpage
+	{\let\oldnumberline\numberline
+		\renewcommand{\numberline}[1]{Bảng~#1:\hspace{1.5em}}
+		\listoftables}
+	\phantomsection\addcontentsline{toc}{section}{\numberline {} DANH MỤC BẢNG BIỂU}
+	\newpage
 	
 	
 	\input{Template/DanhMucVietTat} % Danh mục ký hiệu và chữ viết tắt
