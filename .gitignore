@@ -1,9 +1,0 @@
-__pycache__/
-*.py[cod]
-*$py.class
-.DS_Store
-patch_scripts/
-/tmp/frr_*
-results/*.xlsx
-results/*.png
-!results/.gitkeep
